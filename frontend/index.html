@@ -3,709 +3,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vault — Secure Cloud Storage</title>
+<title>Snorlax — Secure Cloud Storage</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #0A0C10;
-    --surface: #12151C;
-    --card: #1A1E2A;
-    --card-hover: #1E2330;
-    --border: #252A38;
-    --border-bright: #2E3549;
-    --blue: #4F8EF7;
-    --blue-dim: rgba(79,142,247,0.12);
-    --blue-glow: rgba(79,142,247,0.25);
-    --green: #2DCC8F;
-    --green-dim: rgba(45,204,143,0.12);
-    --red: #F75C5C;
-    --red-dim: rgba(247,92,92,0.12);
-    --yellow: #F7C948;
-    --text: #E8EBF2;
-    --text-muted: #6B7490;
-    --text-dim: #3E4559;
-    --font-ui: 'Space Grotesk', sans-serif;
-    --font-body: 'Inter', sans-serif;
-    --radius: 12px;
-    --radius-sm: 8px;
-    --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  body {
-    font-family: var(--font-body);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    overflow: hidden;
-  }
-
-  /* ── SIDEBAR ── */
-  #sidebar {
-    width: 240px;
-    min-height: 100vh;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 10;
-  }
-
-  .sidebar-logo {
-    padding: 28px 24px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .logo-orb {
-    width: 34px; height: 34px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--blue) 0%, #7B5EF7 100%);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 18px rgba(79,142,247,0.4);
-    flex-shrink: 0;
-  }
-
-  .logo-orb svg { width: 18px; height: 18px; }
-
-  .logo-text {
-    font-family: var(--font-ui);
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-    color: var(--text);
-  }
-
-  .logo-text span { color: var(--blue); }
-
-  .sidebar-nav {
-    flex: 1;
-    padding: 16px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .nav-label {
-    font-family: var(--font-ui);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    padding: 12px 12px 6px;
-  }
-
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: background var(--transition), color var(--transition);
-    font-family: var(--font-ui);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-muted);
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-  }
-
-  .nav-item:hover { background: var(--card); color: var(--text); }
-  .nav-item.active { background: var(--blue-dim); color: var(--blue); }
-
-  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
-
-  .sidebar-user {
-    padding: 16px 12px;
-    border-top: 1px solid var(--border);
-  }
-
-  .user-card {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    background: var(--card);
-  }
-
-  .user-avatar {
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #7B5EF7, var(--blue));
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-ui);
-    font-size: 13px;
-    font-weight: 700;
-    color: #fff;
-    flex-shrink: 0;
-  }
-
-  .user-info { flex: 1; min-width: 0; }
-  .user-name { font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .user-role { font-size: 11px; color: var(--text-muted); }
-
-  .btn-logout {
-    background: none; border: none; cursor: pointer;
-    color: var(--text-dim); transition: color var(--transition);
-    padding: 4px;
-    display: flex; align-items: center;
-  }
-  .btn-logout:hover { color: var(--red); }
-  .btn-logout svg { width: 15px; height: 15px; }
-
-  /* ── MAIN ── */
-  #main {
-    flex: 1;
-    min-height: 100vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .topbar {
-    padding: 20px 32px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--surface);
-    position: sticky;
-    top: 0;
-    z-index: 5;
-  }
-
-  .topbar-title {
-    font-family: var(--font-ui);
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-  }
-
-  .topbar-actions { display: flex; gap: 10px; align-items: center; }
-
-  .content { padding: 32px; flex: 1; }
-
-  /* ── VIEWS ── */
-  .view { display: none; }
-  .view.active { display: block; }
-
-  /* ── AUTH SCREEN ── */
-  #auth-screen {
-    position: fixed; inset: 0;
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-  }
-
-  .auth-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 40px;
-    width: 380px;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
-  }
-
-  .auth-logo {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 32px;
-  }
-
-  .auth-tabs {
-    display: flex;
-    background: var(--card);
-    border-radius: var(--radius-sm);
-    padding: 4px;
-    margin-bottom: 28px;
-    gap: 2px;
-  }
-
-  .auth-tab {
-    flex: 1;
-    padding: 8px;
-    text-align: center;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: var(--font-ui);
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-muted);
-    transition: all var(--transition);
-    border: none;
-    background: none;
-  }
-
-  .auth-tab.active { background: var(--card-hover); color: var(--text); }
-
-  .auth-form { display: flex; flex-direction: column; gap: 14px; }
-
-  .field-label {
-    font-family: var(--font-ui);
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    display: block;
-    letter-spacing: 0.3px;
-  }
-
-  .field-input {
-    width: 100%;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 11px 14px;
-    font-family: var(--font-body);
-    font-size: 14px;
-    color: var(--text);
-    outline: none;
-    transition: border-color var(--transition), box-shadow var(--transition);
-  }
-
-  .field-input:focus {
-    border-color: var(--blue);
-    box-shadow: 0 0 0 3px var(--blue-glow);
-  }
-
-  .field-input::placeholder { color: var(--text-dim); }
-
-  /* ── BUTTONS ── */
-  .btn {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 10px 18px;
-    border-radius: var(--radius-sm);
-    font-family: var(--font-ui);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all var(--transition);
-    white-space: nowrap;
-  }
-
-  .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
-
-  .btn-primary {
-    background: var(--blue);
-    color: #fff;
-    box-shadow: 0 4px 14px rgba(79,142,247,0.3);
-  }
-  .btn-primary:hover { background: #6AA3F9; box-shadow: 0 4px 20px rgba(79,142,247,0.45); transform: translateY(-1px); }
-  .btn-primary:active { transform: translateY(0); }
-
-  .btn-secondary {
-    background: var(--card);
-    color: var(--text);
-    border: 1px solid var(--border-bright);
-  }
-  .btn-secondary:hover { background: var(--card-hover); border-color: var(--blue); color: var(--blue); }
-
-  .btn-danger {
-    background: var(--red-dim);
-    color: var(--red);
-    border: 1px solid transparent;
-  }
-  .btn-danger:hover { background: var(--red); color: #fff; }
-
-  .btn-ghost {
-    background: none;
-    color: var(--text-muted);
-    border: none;
-    padding: 8px 12px;
-  }
-  .btn-ghost:hover { color: var(--text); background: var(--card); }
-
-  .btn-full { width: 100%; justify-content: center; padding: 12px; font-size: 14px; }
-
-  /* ── BUCKETS GRID ── */
-  .buckets-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px;
-    margin-top: 8px;
-  }
-
-  .bucket-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 22px;
-    cursor: pointer;
-    transition: all var(--transition);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .bucket-card::before {
-    content: '';
-    position: absolute;
-    top: -60px; left: -60px;
-    width: 120px; height: 120px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--blue-glow) 0%, transparent 70%);
-    transition: opacity var(--transition), transform 0.3s ease;
-    opacity: 0;
-    transform: scale(0.7);
-  }
-
-  .bucket-card:hover::before { opacity: 1; transform: scale(1); }
-  .bucket-card:hover { border-color: var(--blue); background: var(--card-hover); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-
-  .bucket-icon {
-    width: 44px; height: 44px;
-    border-radius: 10px;
-    background: var(--blue-dim);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 16px;
-    border: 1px solid rgba(79,142,247,0.2);
-  }
-
-  .bucket-icon svg { width: 22px; height: 22px; color: var(--blue); }
-
-  .bucket-name {
-    font-family: var(--font-ui);
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-
-  .bucket-meta { font-size: 12px; color: var(--text-muted); }
-
-  .bucket-card-actions {
-    position: absolute; top: 14px; right: 14px;
-    display: flex; gap: 4px;
-    opacity: 0; transition: opacity var(--transition);
-  }
-  .bucket-card:hover .bucket-card-actions { opacity: 1; }
-
-  .icon-btn {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px;
-    transition: all var(--transition);
-    background: var(--surface);
-    color: var(--text-muted);
-  }
-  .icon-btn:hover { background: var(--card-hover); color: var(--text); }
-  .icon-btn.danger:hover { background: var(--red); color: #fff; }
-  .icon-btn svg { width: 13px; height: 13px; }
-
-  /* ADD BUCKET CARD */
-  .add-bucket-card {
-    background: transparent;
-    border: 1px dashed var(--border-bright);
-    border-radius: var(--radius);
-    padding: 22px;
-    cursor: pointer;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 10px;
-    min-height: 140px;
-    transition: all var(--transition);
-    color: var(--text-dim);
-  }
-  .add-bucket-card:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
-  .add-bucket-card svg { width: 28px; height: 28px; }
-  .add-bucket-card span { font-family: var(--font-ui); font-size: 13px; font-weight: 600; }
-
-  /* ── OBJECTS TABLE ── */
-  .objects-header {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .back-btn {
-    display: flex; align-items: center; gap: 6px;
-    color: var(--text-muted);
-    cursor: pointer; font-family: var(--font-ui);
-    font-size: 13px; font-weight: 500;
-    background: none; border: none;
-    padding: 6px 10px; border-radius: 6px;
-    transition: all var(--transition);
-  }
-  .back-btn:hover { background: var(--card); color: var(--text); }
-  .back-btn svg { width: 15px; height: 15px; }
-
-  .breadcrumb-sep { color: var(--text-dim); }
-
-  .breadcrumb-current {
-    font-family: var(--font-ui);
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.3px;
-  }
-
-  .table-wrap {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .table-head {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr 120px;
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-
-  .th {
-    font-family: var(--font-ui);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-
-  .table-row {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr 120px;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    align-items: center;
-    transition: background var(--transition);
-  }
-  .table-row:last-child { border-bottom: none; }
-  .table-row:hover { background: var(--card-hover); }
-
-  .obj-name { font-family: var(--font-ui); font-size: 14px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 10px; }
-  .obj-name svg { width: 16px; height: 16px; color: var(--blue); flex-shrink: 0; }
-
-  .obj-meta { font-size: 13px; color: var(--text-muted); }
-
-  .badge {
-    display: inline-flex; align-items: center;
-    padding: 3px 9px;
-    border-radius: 20px;
-    font-family: var(--font-ui);
-    font-size: 11px;
-    font-weight: 600;
-  }
-  .badge-green { background: var(--green-dim); color: var(--green); }
-  .badge-muted { background: var(--border); color: var(--text-muted); }
-  .badge-blue { background: var(--blue-dim); color: var(--blue); }
-
-  .row-actions { display: flex; gap: 4px; align-items: center; justify-content: flex-end; }
-
-  .empty-state {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 60px 20px;
-    gap: 12px;
-    color: var(--text-muted);
-  }
-  .empty-state svg { width: 48px; height: 48px; color: var(--text-dim); }
-  .empty-state h3 { font-family: var(--font-ui); font-size: 16px; font-weight: 600; color: var(--text-muted); }
-  .empty-state p { font-size: 13px; }
-
-  /* ── MODAL ── */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px);
-    z-index: 50;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity var(--transition);
-  }
-
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
-
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border-bright);
-    border-radius: 16px;
-    padding: 32px;
-    width: 420px;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.7);
-    transform: translateY(8px);
-    transition: transform var(--transition);
-  }
-
-  .modal-overlay.open .modal { transform: translateY(0); }
-
-  .modal-title {
-    font-family: var(--font-ui);
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    letter-spacing: -0.2px;
-  }
-
-  .modal-form { display: flex; flex-direction: column; gap: 16px; }
-
-  .modal-actions {
-    display: flex; gap: 10px; justify-content: flex-end;
-    margin-top: 8px;
-  }
-
-  /* ── UPLOAD ZONE ── */
-  .upload-zone {
-    border: 2px dashed var(--border-bright);
-    border-radius: var(--radius);
-    padding: 40px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all var(--transition);
-    background: var(--card);
-  }
-  .upload-zone:hover, .upload-zone.dragging {
-    border-color: var(--blue);
-    background: var(--blue-dim);
-  }
-  .upload-zone svg { width: 36px; height: 36px; color: var(--text-dim); margin-bottom: 12px; }
-  .upload-zone p { font-family: var(--font-ui); font-size: 14px; color: var(--text-muted); }
-  .upload-zone span { font-size: 12px; color: var(--text-dim); }
-
-  /* ── TOAST ── */
-  #toast-container {
-    position: fixed;
-    bottom: 24px; right: 24px;
-    display: flex; flex-direction: column; gap: 10px;
-    z-index: 200;
-  }
-
-  .toast {
-    background: var(--surface);
-    border: 1px solid var(--border-bright);
-    border-radius: 10px;
-    padding: 14px 18px;
-    display: flex; align-items: center; gap: 12px;
-    font-family: var(--font-ui);
-    font-size: 13px;
-    font-weight: 500;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    animation: slideIn 0.25s ease;
-    min-width: 260px;
-  }
-
-  .toast.success { border-left: 3px solid var(--green); }
-  .toast.error { border-left: 3px solid var(--red); }
-  .toast.info { border-left: 3px solid var(--blue); }
-
-  .toast-icon { width: 18px; height: 18px; flex-shrink: 0; }
-  .toast.success .toast-icon { color: var(--green); }
-  .toast.error .toast-icon { color: var(--red); }
-  .toast.info .toast-icon { color: var(--blue); }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(20px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  /* ── STATS ── */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
-  }
-
-  .stat-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 22px;
-  }
-
-  .stat-label {
-    font-family: var(--font-ui);
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--text-dim);
-    margin-bottom: 10px;
-  }
-
-  .stat-value {
-    font-family: var(--font-ui);
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -1px;
-    color: var(--text);
-  }
-
-  .stat-value span { font-size: 14px; font-weight: 400; color: var(--text-muted); margin-left: 4px; }
-
-  /* ── UPLOAD PROGRESS ── */
-  .progress-bar-wrap {
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-top: 12px;
-  }
-
-  .progress-bar {
-    height: 100%;
-    background: var(--blue);
-    border-radius: 2px;
-    transition: width 0.3s ease;
-  }
-
-  /* ── SECTION HEADER ── */
-  .section-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 20px;
-  }
-
-  .section-title {
-    font-family: var(--font-ui);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.2px;
-  }
-
-  /* scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
-
-  /* hidden util */
-  .hidden { display: none !important; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F8FAFC;
+  --surface:#FFFFFF;
+  --card:#FFFFFF;
+  --card-hover:#F8FAFC;
+  --border:#E2E8F0;
+  --border-strong:#CBD5E1;
+  --blue:#2563EB;
+  --blue-hover:#1D4ED8;
+  --blue-dim:#EFF6FF;
+  --blue-border:#BFDBFE;
+  --green:#059669;
+  --green-dim:#ECFDF5;
+  --green-border:#A7F3D0;
+  --red:#DC2626;
+  --red-dim:#FEF2F2;
+  --red-border:#FECACA;
+  --yellow:#D97706;
+  --text:#0F172A;
+  --text-muted:#64748B;
+  --text-dim:#94A3B8;
+  --text-faint:#CBD5E1;
+  --font-ui:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --radius:10px;
+  --radius-sm:8px;
+  --radius-lg:14px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.07);
+  --shadow-lg:0 10px 30px rgba(0,0,0,0.08);
+  --transition:160ms cubic-bezier(0.4,0,0.2,1);
+}
+body{
+  font-family:var(--font-ui);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+#sidebar{
+  width:256px;min-height:100vh;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  flex-shrink:0;z-index:10;
+}
+.sidebar-logo{
+  padding:22px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:11px;
+}
+.logo-mark{
+  width:36px;height:36px;border-radius:9px;
+  background:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(37,99,235,0.25);
+}
+.logo-mark svg{width:19px;height:19px}
+.logo-text{font-size:17px;font-weight:700;letter-spacing:-0.4px;color:var(--text)}
+.logo-text em{font-style:normal;color:var(--blue);font-weight:700}
+.logo-sub{font-size:11px;color:var(--text-muted);letter-spacing:0.2px;margin-top:1px}
+.sidebar-nav{flex:1;padding:16px 10px;display:flex;flex-direction:column;gap:2px}
+.nav-label{font-size:10.5px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-dim);padding:14px 10px 6px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:8px;cursor:pointer;
+  font-size:13.5px;font-weight:500;color:var(--text-muted);
+  border:none;background:none;width:100%;text-align:left;transition:all var(--transition)
+}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--blue-dim);color:var(--blue);font-weight:600}
+.nav-item.active svg{color:var(--blue)}
+.nav-item svg{width:17px;height:17px;flex-shrink:0;color:var(--text-dim)}
+.sidebar-foot{padding:12px 10px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:9px;background:var(--bg);border:1px solid var(--border)}
+.user-avatar{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2563EB,#7C3AED);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:11px;color:var(--text-muted)}
+.btn-logout{background:none;border:none;cursor:pointer;color:var(--text-dim);padding:6px;border-radius:6px;display:flex;align-items:center;transition:all var(--transition)}
+.btn-logout:hover{background:var(--red-dim);color:var(--red)}
+.btn-logout svg{width:16px;height:16px}
+#main{flex:1;min-height:100vh;overflow-y:auto;display:flex;flex-direction:column;background:var(--bg)}
+.topbar{
+  padding:0 28px;height:64px;
+  background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:5;
+}
+.topbar-title{font-size:17px;font-weight:700;letter-spacing:-0.3px;color:var(--text);display:flex;align-items:center;gap:10px}
+.topbar-title svg{color:var(--text-dim)}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.content{padding:28px;flex:1;max-width:1200px;width:100%;margin:0 auto}
+.view{display:none}.view.active{display:block}
+#auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.auth-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:36px;width:400px;box-shadow:var(--shadow-lg);
+}
+.auth-head{margin-bottom:28px;text-align:center}
+.auth-head .logo-mark{margin:0 auto 14px;width:44px;height:44px;border-radius:12px}
+.auth-head h1{font-size:20px;font-weight:700;letter-spacing:-0.4px}
+.auth-head p{font-size:13px;color:var(--text-muted);margin-top:6px}
+.auth-tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;margin-bottom:22px;gap:2px}
+.auth-tab{flex:1;padding:8px;text-align:center;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-muted);border:none;background:none;transition:all var(--transition)}
+.auth-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.auth-form{display:flex;flex-direction:column;gap:14px}
+.field-label{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:6px;display:block}
+.field-hint{font-size:11.5px;color:var(--text-muted);margin-top:5px}
+.field-input{
+  width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:10px 12px;font-family:var(--font-ui);font-size:13.5px;color:var(--text);
+  outline:none;transition:border-color var(--transition),box-shadow var(--transition)
+}
+.field-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,0.12)}
+.field-input::placeholder{color:var(--text-dim)}
+select.field-input{cursor:pointer}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:9px 16px;border-radius:8px;font-family:var(--font-ui);font-size:13px;font-weight:600;
+  cursor:pointer;border:none;transition:all var(--transition);white-space:nowrap;line-height:1;
+}
+.btn svg{width:15px;height:15px;flex-shrink:0}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 1px 2px rgba(37,99,235,0.15)}
+.btn-primary:hover{background:var(--blue-hover);box-shadow:0 4px 12px rgba(37,99,235,0.25);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.btn-secondary:hover{background:var(--bg);border-color:var(--border-strong)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#B91C1C}
+.btn-ghost{background:none;color:var(--text-muted);border:1px solid transparent}
+.btn-ghost:hover{background:var(--bg);color:var(--text);border-color:var(--border)}
+.btn-full{width:100%;padding:11px}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:space-between}
+.stat-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);margin-bottom:8px}
+.stat-value{font-size:26px;font-weight:700;letter-spacing:-0.8px;color:var(--text)}
+.stat-value small{font-size:12px;font-weight:500;color:var(--text-muted);margin-left:4px}
+.stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.stat-icon.blue{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)}
+.stat-icon.green{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-size:14px;font-weight:700;letter-spacing:-0.2px;color:var(--text);display:flex;align-items:center;gap:8px}
+.section-title span{color:var(--text-muted);font-weight:500;font-size:13px}
+.buckets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.bucket-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;
+  cursor:pointer;transition:all var(--transition);position:relative;box-shadow:var(--shadow-sm)
+}
+.bucket-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.bucket-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.bucket-icon{width:42px;height:42px;border-radius:10px;background:var(--blue-dim);border:1px solid var(--blue-border);display:flex;align-items:center;justify-content:center;color:var(--blue)}
+.bucket-icon svg{width:20px;height:20px}
+.bucket-actions{display:flex;gap:4px}
+.icon-btn{
+  width:30px;height:30px;border-radius:7px;border:1px solid var(--border);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text-muted);transition:all var(--transition)
+}
+.icon-btn:hover{background:var(--bg);color:var(--text);border-color:var(--border-strong)}
+.icon-btn.danger:hover{background:var(--red-dim);color:var(--red);border-color:var(--red-border)}
+.icon-btn.primary:hover{background:var(--blue-dim);color:var(--blue);border-color:var(--blue-border)}
+.icon-btn svg{width:14px;height:14px}
+.bucket-name{font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bucket-meta{font-size:12px;color:var(--text-muted);margin-top:3px;display:flex;align-items:center;gap:6px}
+.bucket-meta code{font-family:var(--font-mono);font-size:11px;background:var(--bg);border:1px solid var(--border);padding:2px 6px;border-radius:5px;color:var(--text-muted)}
+.add-bucket-card{
+  background:var(--surface);border:1.5px dashed var(--border-strong);border-radius:12px;padding:20px;
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:142px;
+  transition:all var(--transition);color:var(--text-muted)
+}
+.add-bucket-card:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
+.add-bucket-card svg{width:26px;height:26px}
+.add-bucket-card span{font-size:13px;font-weight:600}
+.objects-header{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.back-btn{
+  display:flex;align-items:center;gap:6px;color:var(--text-muted);cursor:pointer;font-size:13px;font-weight:500;
+  background:var(--surface);border:1px solid var(--border);padding:7px 12px;border-radius:8px;transition:all var(--transition)
+}
+.back-btn:hover{background:var(--bg);color:var(--text);border-color:var(--border-strong)}
+.back-btn svg{width:14px;height:14px}
+.breadcrumb-sep{color:var(--text-dim)}
+.breadcrumb-current{font-size:17px;font-weight:700;letter-spacing:-0.3px;color:var(--text)}
+.bucket-settings-btn{margin-left:auto}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.table-head{display:grid;grid-template-columns:2fr 110px 160px 140px 140px;padding:11px 16px;border-bottom:1px solid var(--border);background:#F8FAFC}
+.th{font-size:11px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:var(--text-muted)}
+.table-row{display:grid;grid-template-columns:2fr 110px 160px 140px 140px;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;transition:background var(--transition)}
+.table-row:last-child{border-bottom:none}
+.table-row:hover{background:#F8FAFC}
+.obj-name{font-size:13.5px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:10px;min-width:0}
+.obj-name svg{width:16px;height:16px;color:var(--text-dim);flex-shrink:0}
+.obj-name span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.obj-meta{font-size:13px;color:var(--text-muted)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:600;border:1px solid}
+.badge-green{background:var(--green-dim);color:var(--green);border-color:var(--green-border)}
+.badge-muted{background:#F1F5F9;color:var(--text-muted);border-color:var(--border)}
+.badge-blue{background:var(--blue-dim);color:var(--blue);border-color:var(--blue-border)}
+.toggle{
+  position:relative;width:38px;height:22px;background:#E2E8F0;border-radius:20px;cursor:pointer;transition:background var(--transition);border:none;flex-shrink:0
+}
+.toggle.on{background:var(--blue)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.15);transition:transform var(--transition)}
+.toggle.on::after{transform:translateX(16px)}
+.row-actions{display:flex;gap:4px;align-items:center;justify-content:flex-end}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;gap:10px;color:var(--text-muted)}
+.empty-state svg{width:44px;height:44px;color:var(--text-faint)}
+.empty-state h3{font-size:14px;font-weight:600;color:var(--text)}
+.empty-state p{font-size:13px}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--transition);padding:20px}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.15);transform:translateY(8px) scale(0.98);transition:transform var(--transition);max-height:90vh;overflow-y:auto}
+.modal-overlay.open .modal{transform:translateY(0) scale(1)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-size:16px;font-weight:700;letter-spacing:-0.2px}
+.modal-close{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:all var(--transition)}
+.modal-close:hover{background:var(--bg)}
+.modal-form{display:flex;flex-direction:column;gap:14px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.divider{height:1px;background:var(--border);margin:6px 0}
+.switch-row{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--border);border-radius:9px;background:var(--bg)}
+.switch-label{font-size:13px;font-weight:600;color:var(--text)}
+.switch-desc{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.upload-zone{border:1.5px dashed var(--border-strong);border-radius:10px;padding:28px 16px;text-align:center;cursor:pointer;transition:all var(--transition);background:#F8FAFC}
+.upload-zone:hover,.upload-zone.dragging{border-color:var(--blue);background:var(--blue-dim)}
+.upload-zone svg{width:32px;height:32px;color:var(--text-dim);margin-bottom:10px}
+.upload-zone p{font-size:13.5px;font-weight:500;color:var(--text)}
+.upload-zone span{font-size:12px;color:var(--text-muted)}
+.progress-bar-wrap{height:6px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:10px}
+.progress-bar{height:100%;background:var(--blue);border-radius:20px;transition:width 0.3s ease}
+#toast-container{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:200}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;box-shadow:var(--shadow-md);animation:slideIn 0.22s ease;min-width:280px}
+.toast.success{border-left:3px solid var(--green)} .toast.error{border-left:3px solid var(--red)} .toast.info{border-left:3px solid var(--blue)}
+.toast-icon{width:18px;height:18px;flex-shrink:0}
+.toast.success .toast-icon{color:var(--green)} .toast.error .toast-icon{color:var(--red)} .toast.info .toast-icon{color:var(--blue)}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.hidden{display:none !important}
+::-webkit-scrollbar{width:6px;height:6px} ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+@media(max-width:760px){
+  #sidebar{display:none}
+  .table-head,.table-row{grid-template-columns:1fr 90px 80px}
+  .table-head div:nth-child(3),.table-row div:nth-child(3){display:none}
+  .table-head div:nth-child(5),.table-row div:nth-child(5){display:none}
+}
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
 <div id="auth-screen">
-  <div class="auth-box">
-    <div class="auth-logo">
-      <div class="logo-orb">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+  <div class="auth-card">
+    <div class="auth-head">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
       </div>
-      <span class="logo-text">V<span>ault</span></span>
+      <h1>Snorlax</h1>
+      <p>Secure encrypted cloud storage</p>
     </div>
-
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
       <button class="auth-tab" onclick="switchAuthTab('register')">Create Account</button>
     </div>
-
-    <div class="auth-form" id="auth-form">
+    <div class="auth-form">
       <div>
         <label class="field-label">Username</label>
         <input class="field-input" type="text" id="auth-username" placeholder="your_username" autocomplete="username">
@@ -719,34 +286,33 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-orb">
+    <div class="logo-mark">
       <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
     </div>
-    <span class="logo-text">V<span>ault</span></span>
+    <div>
+      <div class="logo-text">Snorlax</div>
+      <div class="logo-sub">Cloud Storage</div>
+    </div>
   </div>
-
   <nav class="sidebar-nav">
     <div class="nav-label">Storage</div>
     <button class="nav-item active" onclick="navigateTo('buckets')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
       Buckets
     </button>
-
     <div class="nav-label" style="margin-top:8px">Account</div>
     <button class="nav-item" onclick="navigateTo('settings')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 12 2a10 10 0 0 0-7.07 2.93"/><path d="M4.93 19.07A10 10 0 0 0 12 22a10 10 0 0 0 7.07-2.93"/><path d="M2 12h2m16 0h2M12 2v2m0 16v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 9 15a1.65 1.65 0 0 0-1-1.51V13a2 2 0 0 1 0-4v-.49c.3-.43.73-.75 1-1.51A1.65 1.65 0 0 0 9 5c0-.43.1-.85.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 15 1a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15 9a1.65 1.65 0 0 0 1 1.51V11a2 2 0 0 1 0 4v.49c-.3.43-.73.75-1 1.51Z"/></svg>
       Settings
     </button>
   </nav>
-
-  <div class="sidebar-user">
+  <div class="sidebar-foot">
     <div class="user-card">
       <div class="user-avatar" id="user-avatar-initials">?</div>
-      <div class="user-info">
-        <div class="user-name" id="sidebar-username">Loading...</div>
+      <div style="flex:1;min-width:0">
+        <div class="user-name" id="sidebar-username">—</div>
         <div class="user-role">Storage User</div>
       </div>
       <button class="btn-logout" onclick="handleLogout()" title="Logout">
@@ -757,10 +323,13 @@
 </div>
 
 <div id="main">
-  <!-- TOPBAR -->
   <div class="topbar">
     <div id="topbar-title" class="topbar-title">Buckets</div>
     <div class="topbar-actions">
+      <button class="btn btn-secondary hidden" id="btn-bucket-settings" onclick="openBucketSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 9 15a1.65 1.65 0 0 0-1-1.51V13a2 2 0 0 1 0-4v-.49c.3-.43.73-.75 1-1.51A1.65 1.65 0 0 0 9 5c0-.43.1-.85.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 15 1a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15 9a1.65 1.65 0 0 0 1 1.51V11a2 2 0 0 1 0 4v.49c-.3.43-.73.75-1 1.51Z"/></svg>
+        Bucket Settings
+      </button>
       <button class="btn btn-primary hidden" id="btn-new-bucket" onclick="openModal('bucket-modal')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         New Bucket
@@ -772,41 +341,44 @@
     </div>
   </div>
 
-  <!-- CONTENT -->
   <div class="content">
-
-    <!-- BUCKETS VIEW -->
     <div id="view-buckets" class="view active">
-      <div class="stats-row" id="stats-row">
+      <div class="stats-row">
         <div class="stat-card">
-          <div class="stat-label">Total Buckets</div>
-          <div class="stat-value" id="stat-buckets">—</div>
+          <div>
+            <div class="stat-label">Total Buckets</div>
+            <div class="stat-value" id="stat-buckets">—</div>
+          </div>
+          <div class="stat-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Total Objects</div>
-          <div class="stat-value" id="stat-objects">—</div>
+          <div>
+            <div class="stat-label">Total Objects</div>
+            <div class="stat-value" id="stat-objects">—</div>
+          </div>
+          <div class="stat-icon green">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+          </div>
         </div>
       </div>
-
       <div class="section-header">
-        <span class="section-title">Your Buckets</span>
+        <span class="section-title">Your Buckets <span id="bucket-count-label"></span></span>
       </div>
-      <div class="buckets-grid" id="buckets-grid">
-        <!-- Loaded dynamically -->
-      </div>
+      <div class="buckets-grid" id="buckets-grid"></div>
     </div>
 
-    <!-- OBJECTS VIEW -->
     <div id="view-objects" class="view">
       <div class="objects-header">
         <button class="back-btn" onclick="navigateTo('buckets')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-          Buckets
+          Back
         </button>
         <span class="breadcrumb-sep">/</span>
         <span class="breadcrumb-current" id="bucket-breadcrumb">—</span>
+        <span style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono)" id="bucket-id-label"></span>
       </div>
-
       <div class="table-wrap">
         <div class="table-head">
           <div class="th">Name</div>
@@ -818,93 +390,103 @@
         <div id="objects-list">
           <div class="empty-state">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-            <h3>No objects yet</h3>
-            <p>Upload your first file to this bucket</p>
+            <h3>No objects yet</h3><p>Upload your first file to this bucket</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SETTINGS VIEW -->
     <div id="view-settings" class="view">
-      <div class="section-header" style="margin-bottom:28px">
+      <div class="section-header" style="margin-bottom:22px">
         <span class="section-title">Account Settings</span>
       </div>
-
-      <div style="max-width:480px; display:flex; flex-direction:column; gap:20px;">
-        <div class="table-wrap" style="padding:24px;">
-          <div style="font-family:var(--font-ui); font-size:14px; font-weight:600; color:var(--text); margin-bottom:16px;">Update Username</div>
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <div>
-              <label class="field-label">New Username</label>
-              <input class="field-input" type="text" id="settings-username" placeholder="new_username">
-            </div>
-            <button class="btn btn-secondary" style="align-self:flex-start" onclick="updateUsername()">Update Username</button>
+      <div style="max-width:520px;display:flex;flex-direction:column;gap:16px">
+        <div class="table-wrap" style="padding:22px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:14px">Update Username</div>
+          <label class="field-label">New Username</label>
+          <div style="display:flex;gap:10px;margin-top:6px">
+            <input class="field-input" type="text" id="settings-username" placeholder="new_username" style="flex:1">
+            <button class="btn btn-secondary" onclick="updateUsername()">Update</button>
           </div>
         </div>
-
-        <div class="table-wrap" style="padding:24px;">
-          <div style="font-family:var(--font-ui); font-size:14px; font-weight:600; color:var(--text); margin-bottom:16px;">Update Password</div>
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <div>
-              <label class="field-label">New Password</label>
-              <input class="field-input" type="password" id="settings-password" placeholder="••••••••">
-            </div>
-            <button class="btn btn-secondary" style="align-self:flex-start" onclick="updatePassword()">Update Password</button>
+        <div class="table-wrap" style="padding:22px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:14px">Update Password</div>
+          <label class="field-label">New Password</label>
+          <div style="display:flex;gap:10px;margin-top:6px">
+            <input class="field-input" type="password" id="settings-password" placeholder="••••••••" style="flex:1">
+            <button class="btn btn-secondary" onclick="updatePassword()">Update</button>
           </div>
         </div>
-
-        <div class="table-wrap" style="padding:24px; border-color: var(--red);">
-          <div style="font-family:var(--font-ui); font-size:14px; font-weight:600; color:var(--red); margin-bottom:8px;">Danger Zone</div>
-          <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Permanently delete your account and all associated data.</p>
+        <div class="table-wrap" style="padding:22px;border-color:var(--red-border);background:var(--red-dim)">
+          <div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:6px">Danger Zone</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Permanently delete your account and all buckets, objects and data.</p>
           <button class="btn btn-danger" onclick="confirmDeleteAccount()">Delete Account</button>
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- MODALS -->
-
-<!-- New Bucket Modal -->
 <div class="modal-overlay" id="bucket-modal">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-title">Create New Bucket</div>
-    <div class="modal-form">
-      <div>
-        <label class="field-label">Bucket Name</label>
-        <input class="field-input" type="text" id="new-bucket-name" placeholder="my-assets">
-      </div>
-      <div>
-        <label class="field-label">Bucket Password</label>
-        <input class="field-input" type="password" id="new-bucket-pass" placeholder="Used to encrypt files">
-      </div>
+    <div class="modal-head">
+      <div class="modal-title">Create New Bucket</div>
+      <button class="modal-close" onclick="closeModal('bucket-modal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div class="modal-actions" style="margin-top:24px">
+    <div class="modal-form">
+      <div><label class="field-label">Bucket Name</label><input class="field-input" type="text" id="new-bucket-name" placeholder="my-assets"></div>
+      <div><label class="field-label">Encryption Password</label><input class="field-input" type="password" id="new-bucket-pass" placeholder="Used to encrypt files"><div class="field-hint">Keep it safe — needed to decrypt your files.</div></div>
+    </div>
+    <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('bucket-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="createBucket()">Create Bucket</button>
     </div>
   </div>
 </div>
 
-<!-- Upload File Modal -->
-<div class="modal-overlay" id="upload-modal">
+<div class="modal-overlay" id="bucket-settings-modal">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-title">Upload File</div>
+    <div class="modal-head">
+      <div class="modal-title">Bucket Settings</div>
+      <button class="modal-close" onclick="closeModal('bucket-settings-modal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
     <div class="modal-form">
       <div>
-        <label class="field-label">Object Name</label>
-        <input class="field-input" type="text" id="upload-obj-name" placeholder="my-file">
+        <label class="field-label">Bucket Name</label>
+        <input class="field-input" type="text" id="edit-bucket-name" placeholder="bucket name">
+        <div class="field-hint">Rename your bucket.</div>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
-        <div>
-          <label class="field-label">Visibility</label>
-          <select class="field-input" id="upload-is-public" style="cursor:pointer">
-            <option value="false">🔒 Private</option>
-            <option value="true">🌐 Public</option>
-          </select>
+      <div class="divider"></div>
+      <div style="font-size:13px;font-weight:600;color:var(--text)">Change Encryption Password</div>
+      <div><label class="field-label">Current Password</label><input class="field-input" type="password" id="edit-bucket-old-pass" placeholder="Current password"></div>
+      <div><label class="field-label">New Password</label><input class="field-input" type="password" id="edit-bucket-new-pass" placeholder="New password"></div>
+      <div class="field-hint">Files are encrypted with this password. Changing it will affect future uploads/downloads.</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('bucket-settings-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBucketSettings()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title">Upload File</div>
+      <button class="modal-close" onclick="closeModal('upload-modal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-form">
+      <div><label class="field-label">Object Name</label><input class="field-input" type="text" id="upload-obj-name" placeholder="my-file"></div>
+      <div>
+        <label class="field-label">Visibility</label>
+        <div class="switch-row">
+          <div>
+            <div class="switch-label" id="upload-visibility-label">Private — only you can access</div>
+            <div class="switch-desc">Toggle to make file publicly accessible</div>
+          </div>
+          <button class="toggle" id="upload-visibility-toggle" onclick="toggleUploadVisibility()"></button>
         </div>
+        <input type="hidden" id="upload-is-public" value="false">
       </div>
       <div>
         <label class="field-label">File</label>
@@ -917,459 +499,374 @@
       </div>
       <div id="upload-progress-wrap" class="hidden">
         <div class="progress-bar-wrap"><div class="progress-bar" id="upload-progress-bar" style="width:0%"></div></div>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:6px;" id="upload-progress-label">Uploading...</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:6px" id="upload-progress-label">Uploading…</div>
       </div>
     </div>
-    <div class="modal-actions" style="margin-top:24px">
+    <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('upload-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="uploadObject()" id="upload-btn">Upload</button>
     </div>
   </div>
 </div>
 
-<!-- Rename Object Modal -->
-<div class="modal-overlay" id="rename-modal">
+<div class="modal-overlay" id="object-settings-modal">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-title">Rename Object</div>
-    <div class="modal-form">
-      <div>
-        <label class="field-label">New Name</label>
-        <input class="field-input" type="text" id="rename-input" placeholder="new-name">
-      </div>
+    <div class="modal-head">
+      <div class="modal-title">Object Settings</div>
+      <button class="modal-close" onclick="closeModal('object-settings-modal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <input type="hidden" id="rename-obj-uuid">
-    <div class="modal-actions" style="margin-top:24px">
-      <button class="btn btn-ghost" onclick="closeModal('rename-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="renameObject()">Rename</button>
+    <div class="modal-form">
+      <div><label class="field-label">Object Name</label><input class="field-input" type="text" id="edit-object-name" placeholder="object name"><div class="field-hint">Without extension — extension is preserved automatically.</div></div>
+      <div>
+        <label class="field-label">Visibility</label>
+        <div class="switch-row">
+          <div>
+            <div class="switch-label" id="edit-object-visibility-label">Private</div>
+            <div class="switch-desc" id="edit-object-visibility-desc">Only you can access this file</div>
+          </div>
+          <button class="toggle" id="edit-object-visibility-toggle" onclick="toggleEditObjectVisibility()"></button>
+        </div>
+        <input type="hidden" id="edit-object-is-public" value="false">
+      </div>
+      <input type="hidden" id="edit-object-uuid">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('object-settings-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveObjectSettings()">Save Changes</button>
     </div>
   </div>
 </div>
 
-<!-- Toast Container -->
 <div id="toast-container"></div>
 
 <script>
-const API = 'http://localhost:5050';
-let currentUser = '';
-let currentBucketId = null;
-let currentBucketName = '';
-let selectedFile = null;
-let currentView = 'buckets';
-let totalObjects = 0;
+const API='http://localhost:5050';
+let currentUser='',currentBucketId=null,currentBucketName='',selectedFile=null,totalObjects=0;
+let uploadIsPublic=false, editObjectIsPublic=false;
 
-// ── AUTH ──
-let authMode = 'login';
-function switchAuthTab(mode) {
-  authMode = mode;
-  document.querySelectorAll('.auth-tab').forEach((t,i) => {
-    t.classList.toggle('active', (mode==='login' && i===0) || (mode==='register' && i===1));
+let authMode='login';
+function switchAuthTab(mode){
+  authMode=mode;
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>{
+    t.classList.toggle('active',(mode==='login'&&i===0)||(mode==='register'&&i===1));
   });
-  document.getElementById('auth-btn').textContent = mode === 'login' ? 'Sign In' : 'Create Account';
+  document.getElementById('auth-btn').textContent=mode==='login'?'Sign In':'Create Account';
 }
-
-async function handleAuth() {
-  const user = document.getElementById('auth-username').value.trim();
-  const pass = document.getElementById('auth-password').value;
-  if (!user || !pass) return toast('Please fill in all fields', 'error');
-
-  if (authMode === 'register') {
-    const r = await api('POST', '/', { user_name: user, user_password: pass });
-    if (r.ok) {
-      toast('Account created! Sign in now.', 'success');
-      switchAuthTab('login');
-    } else {
-      const err = await r.json().catch(()=>({detail:'Error'}));
-      toast(err.detail || 'Registration failed', 'error');
-    }
+async function handleAuth(){
+  const user=document.getElementById('auth-username').value.trim();
+  const pass=document.getElementById('auth-password').value;
+  if(!user||!pass) return toast('Please fill in all fields','error');
+  if(authMode==='register'){
+    const r=await api('POST','/',{user_name:user,user_password:pass});
+    if(r.ok){toast('Account created! Sign in now.','success');switchAuthTab('login');}
+    else{const err=await r.json().catch(()=>({detail:'Error'}));toast(err.detail||'Registration failed','error');}
     return;
   }
-
-  const r = await api('POST', '/login', { user_name: user, user_password: pass });
-  if (r.ok) {
-    currentUser = user;
-    document.getElementById('sidebar-username').textContent = user;
-    document.getElementById('user-avatar-initials').textContent = user[0].toUpperCase();
-    document.getElementById('auth-screen').style.display = 'none';
-    toast(`Welcome back, ${user}!`, 'success');
+  const r=await api('POST','/login',{user_name:user,user_password:pass});
+  if(r.ok){
+    currentUser=user;
+    document.getElementById('sidebar-username').textContent=user;
+    document.getElementById('user-avatar-initials').textContent=user[0].toUpperCase();
+    document.getElementById('auth-screen').style.display='none';
+    toast(`Welcome back, ${user}!`,'success');
     loadBuckets();
-  } else {
-    const err = await r.json().catch(()=>({detail:'Invalid credentials'}));
-    toast(err.detail || 'Login failed', 'error');
-  }
+  } else {const err=await r.json().catch(()=>({detail:'Invalid credentials'}));toast(err.detail||'Login failed','error');}
 }
-
-async function handleLogout() {
-  currentUser = '';
-  currentBucketId = null;
-  document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('auth-username').value = '';
-  document.getElementById('auth-password').value = '';
-  toast('Logged out', 'info');
+async function handleLogout(){
+  currentUser='';currentBucketId=null;
+  document.getElementById('auth-screen').style.display='flex';
+  document.getElementById('auth-username').value='';
+  document.getElementById('auth-password').value='';
+  toast('Logged out','info');
 }
-
-// ── NAV ──
-function navigateTo(view) {
-  currentView = view;
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
+function navigateTo(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById(`view-${view}`)?.classList.add('active');
-  const navIdx = { buckets: 0, settings: 1 };
-  const navItems = document.querySelectorAll('.nav-item');
-  navItems[navIdx[view] ?? 0]?.classList.add('active');
-
-  document.getElementById('topbar-title').textContent =
-    view === 'buckets' ? 'Buckets' :
-    view === 'objects' ? currentBucketName :
-    view === 'settings' ? 'Settings' : '';
-
-  document.getElementById('btn-new-bucket').classList.toggle('hidden', view !== 'buckets');
-  document.getElementById('btn-upload-obj').classList.toggle('hidden', view !== 'objects');
-
-  if (view === 'buckets') loadBuckets();
+  const navIdx={buckets:0,settings:1,objects:0};
+  document.querySelectorAll('.nav-item')[navIdx[view]??0]?.classList.add('active');
+  const title={buckets:'Buckets',objects:currentBucketName,settings:'Settings'};
+  document.getElementById('topbar-title').textContent=title[view]||'';
+  document.getElementById('btn-new-bucket').classList.toggle('hidden',view!=='buckets');
+  document.getElementById('btn-upload-obj').classList.toggle('hidden',view!=='objects');
+  document.getElementById('btn-bucket-settings').classList.toggle('hidden',view!=='objects');
+  if(view==='buckets') loadBuckets();
 }
-
-// ── API HELPER ──
-async function api(method, path, body, rawBody) {
-  const opts = {
-    method,
-    credentials: 'include',
-    headers: body && !rawBody ? { 'Content-Type': 'application/json' } : {},
-  };
-  if (body && !rawBody) opts.body = JSON.stringify(body);
-  if (rawBody) opts.body = rawBody;
-  return fetch(API + path, opts);
+async function api(method,path,body,rawBody){
+  const opts={method,credentials:'include',headers:body&&!rawBody?{'Content-Type':'application/json'}:{}};
+  if(body&&!rawBody) opts.body=JSON.stringify(body);
+  if(rawBody) opts.body=rawBody;
+  return fetch(API+path,opts);
 }
-
-// ── BUCKETS ──
-async function loadBuckets() {
-  const r = await api('GET', '/buckets');
-  if (!r.ok) return;
-  const { buckets } = await r.json();
-
-  const grid = document.getElementById('buckets-grid');
-  grid.innerHTML = '';
-
-  let total = 0;
-
-  for (const b of buckets) {
-    const card = document.createElement('div');
-    card.className = 'bucket-card';
-    card.innerHTML = `
-      <div class="bucket-card-actions">
-        <button class="icon-btn danger" title="Delete bucket" onclick="event.stopPropagation(); deleteBucket('${b.bucket_id}', '${b.bucket_name}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-        </button>
-      </div>
-      <div class="bucket-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+async function loadBuckets(){
+  const r=await api('GET','/buckets');
+  if(!r.ok) return;
+  const {buckets}=await r.json();
+  const grid=document.getElementById('buckets-grid');
+  grid.innerHTML='';
+  let total=0;
+  for(const b of buckets){
+    const card=document.createElement('div');
+    card.className='bucket-card';
+    const shortId=String(b.bucket_id).slice(0,8);
+    card.innerHTML=`
+      <div class="bucket-top">
+        <div class="bucket-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+        <div class="bucket-actions">
+          <button class="icon-btn primary" title="Bucket settings" onclick="event.stopPropagation(); openBucketSettings('${b.bucket_id}','${b.bucket_name.replace(/'/g,"\\'")}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 9 15a1.65 1.65 0 0 0-1-1.51V13a2 2 0 0 1 0-4v-.49c.3-.43.73-.75 1-1.51A1.65 1.65 0 0 0 9 5c0-.43.1-.85.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 15 1a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15 9a1.65 1.65 0 0 0 1 1.51V11a2 2 0 0 1 0 4v.49c-.3.43-.73.75-1 1.51Z"/></svg>
+          </button>
+          <button class="icon-btn danger" title="Delete bucket" onclick="event.stopPropagation(); deleteBucket('${b.bucket_id}','${b.bucket_name.replace(/'/g,"\\'")}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
       </div>
       <div class="bucket-name">${b.bucket_name}</div>
-      <div class="bucket-meta">ID: ${String(b.bucket_id).slice(0,8)}…</div>
-    `;
-    card.addEventListener('click', () => openBucket(b.bucket_id, b.bucket_name));
+      <div class="bucket-meta"><code>${shortId}…</code> Bucket</div>`;
+    card.addEventListener('click',()=>openBucket(b.bucket_id,b.bucket_name));
     grid.appendChild(card);
     total++;
   }
-
-  // Add bucket card
-  const addCard = document.createElement('div');
-  addCard.className = 'add-bucket-card';
-  addCard.innerHTML = `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-    <span>New Bucket</span>
-  `;
-  addCard.addEventListener('click', () => openModal('bucket-modal'));
+  const addCard=document.createElement('div');
+  addCard.className='add-bucket-card';
+  addCard.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>New Bucket</span>`;
+  addCard.addEventListener('click',()=>openModal('bucket-modal'));
   grid.appendChild(addCard);
-
-  document.getElementById('stat-buckets').textContent = total;
-  document.getElementById('stat-objects').textContent = totalObjects || '—';
+  document.getElementById('stat-buckets').textContent=total;
+  document.getElementById('bucket-count-label').textContent=`· ${total} total`;
+  document.getElementById('stat-objects').textContent=totalObjects||'—';
 }
-
-async function createBucket() {
-  const name = document.getElementById('new-bucket-name').value.trim();
-  const pass = document.getElementById('new-bucket-pass').value;
-  if (!name || !pass) return toast('Fill in both fields', 'error');
-
-  const r = await api('POST', '/create-bucket', { bucket_name: name, bucket_password: pass });
-  if (r.ok) {
-    toast(`Bucket "${name}" created`, 'success');
-    closeModal('bucket-modal');
-    document.getElementById('new-bucket-name').value = '';
-    document.getElementById('new-bucket-pass').value = '';
-    loadBuckets();
-  } else {
-    const err = await r.json().catch(()=>({detail:'Error'}));
-    toast(err.detail || 'Failed to create bucket', 'error');
+async function createBucket(){
+  const name=document.getElementById('new-bucket-name').value.trim();
+  const pass=document.getElementById('new-bucket-pass').value;
+  if(!name||!pass) return toast('Fill in both fields','error');
+  const r=await api('POST','/create-bucket',{bucket_name:name,bucket_password:pass});
+  if(r.ok){toast(`Bucket "${name}" created`,'success');closeModal('bucket-modal');document.getElementById('new-bucket-name').value='';document.getElementById('new-bucket-pass').value='';loadBuckets();}
+  else{const err=await r.json().catch(()=>({detail:'Error'}));toast(err.detail||'Failed to create bucket','error');}
+}
+async function deleteBucket(id,name){
+  if(!confirm(`Delete bucket "${name}"? This cannot be undone.`)) return;
+  const r=await api('DELETE',`/buckets/${id}`);
+  if(r.ok||r.status===204){toast(`Bucket "${name}" deleted`,'info');loadBuckets();}
+  else toast('Failed to delete bucket','error');
+}
+function openBucketSettings(id,name){
+  const bid=id||currentBucketId;
+  const bname=name||currentBucketName;
+  if(!bid) return;
+  currentBucketId=bid; currentBucketName=bname;
+  document.getElementById('edit-bucket-name').value=bname;
+  document.getElementById('edit-bucket-old-pass').value='';
+  document.getElementById('edit-bucket-new-pass').value='';
+  openModal('bucket-settings-modal');
+}
+async function saveBucketSettings(){
+  const newName=document.getElementById('edit-bucket-name').value.trim();
+  const oldPass=document.getElementById('edit-bucket-old-pass').value;
+  const newPass=document.getElementById('edit-bucket-new-pass').value;
+  const payload={};
+  let hasChange=false;
+  if(newName && newName!==currentBucketName){payload.bucket_name=newName;hasChange=true;}
+  if(oldPass||newPass){
+    if(!oldPass||!newPass) return toast('Fill both password fields to change password','error');
+    payload.bucket_password_old=oldPass;
+    payload.bucket_password=newPass;
+    hasChange=true;
   }
-}
-
-async function deleteBucket(id, name) {
-  if (!confirm(`Delete bucket "${name}"? This cannot be undone.`)) return;
-  const r = await api('DELETE', `/buckets/${id}`);
-  if (r.ok || r.status === 204) {
-    toast(`Bucket "${name}" deleted`, 'info');
+  if(!hasChange) return toast('No changes to save','info');
+  const r=await api('PATCH',`/buckets/${currentBucketId}`,payload);
+  if(r.ok){
+    const j=await r.json().catch(()=>({}));
+    toast('Bucket updated: '+(j.patches||[]).join(', ')||'saved','success');
+    closeModal('bucket-settings-modal');
+    if(payload.bucket_name) currentBucketName=payload.bucket_name;
+    if(document.getElementById('view-objects').classList.contains('active')){
+      document.getElementById('bucket-breadcrumb').textContent=currentBucketName;
+      document.getElementById('topbar-title').textContent=currentBucketName;
+    }
     loadBuckets();
-  } else {
-    toast('Failed to delete bucket', 'error');
-  }
+  } else {const err=await r.json().catch(()=>({detail:'Failed'}));toast(err.detail||'Failed to update bucket','error');}
 }
-
-// ── OBJECTS ──
-async function openBucket(id, name) {
-  currentBucketId = id;
-  currentBucketName = name;
-  document.getElementById('bucket-breadcrumb').textContent = name;
+async function openBucket(id,name){
+  currentBucketId=id;currentBucketName=name;
+  document.getElementById('bucket-breadcrumb').textContent=name;
+  document.getElementById('bucket-id-label').textContent=String(id).slice(0,8);
   navigateTo('objects');
   await loadObjects();
 }
-
-async function loadObjects() {
-  const r = await api('GET', `/buckets/${currentBucketId}`);
-  if (!r.ok) { toast('Failed to load objects', 'error'); return; }
-  const { objects } = await r.json();
-
-  totalObjects = objects.length;
-  const list = document.getElementById('objects-list');
-  list.innerHTML = '';
-
-  if (!objects.length) {
-    list.innerHTML = `
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-        <h3>No objects yet</h3><p>Upload your first file to this bucket</p>
-      </div>`;
+async function loadObjects(){
+  const r=await api('GET',`/buckets/${currentBucketId}`);
+  if(!r.ok){toast('Failed to load objects','error');return;}
+  const {objects}=await r.json();
+  totalObjects=objects.length;
+  document.getElementById('stat-objects').textContent=totalObjects;
+  const list=document.getElementById('objects-list');
+  list.innerHTML='';
+  if(!objects.length){
+    list.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><h3>No objects yet</h3><p>Upload your first file to this bucket</p></div>`;
     return;
   }
-
-  objects.forEach(obj => {
-    const row = document.createElement('div');
-    row.className = 'table-row';
-    const isPublic = obj.is_public;
-    const size = formatBytes(obj.object_size);
-    row.innerHTML = `
-      <div class="obj-name">
-        ${fileIcon(obj.object_file_type)}
-        ${obj.object_name}${obj.object_extension ? '.' + obj.object_extension : ''}
-      </div>
+  objects.forEach(obj=>{
+    const row=document.createElement('div');
+    row.className='table-row';
+    const isPublic=obj.is_public;
+    const size=formatBytes(obj.object_size);
+    const fullName=`${obj.object_name}${obj.object_extension ? '.'+obj.object_extension : ''}`;
+    row.innerHTML=`
+      <div class="obj-name">${fileIcon(obj.object_file_type)}<span title="${fullName}">${fullName}</span></div>
       <div class="obj-meta">${size}</div>
-      <div class="obj-meta">${obj.object_file_type || '—'}</div>
-      <div><span class="badge ${isPublic ? 'badge-green' : 'badge-muted'}">${isPublic ? '🌐 Public' : '🔒 Private'}</span></div>
+      <div class="obj-meta" style="font-family:var(--font-mono);font-size:12px">${(obj.object_file_type||'—').slice(0,18)}</div>
+      <div>
+        <button class="toggle ${isPublic?'on':''}" title="Click to toggle visibility" onclick="toggleObjectPublic('${obj.object_uuid}',${isPublic},'${obj.object_name.replace(/'/g,"\\'")}')"></button>
+        <span class="badge ${isPublic?'badge-green':'badge-muted'}" style="margin-left:8px;vertical-align:middle">${isPublic?'🌐 Public':'🔒 Private'}</span>
+      </div>
       <div class="row-actions">
-        <button class="icon-btn" title="Download" onclick="downloadObject('${obj.object_uuid}', '${obj.object_name}')">
+        <button class="icon-btn" title="Download" onclick="downloadObject('${obj.object_uuid}')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </button>
-        <button class="icon-btn" title="Rename" onclick="openRenameModal('${obj.object_uuid}', '${obj.object_name}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <button class="icon-btn primary" title="Object settings" onclick="openObjectSettings('${obj.object_uuid}','${obj.object_name.replace(/'/g,"\\'")}',${isPublic})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 9 15a1.65 1.65 0 0 0-1-1.51V13a2 2 0 0 1 0-4v-.49c.3-.43.73-.75 1-1.51A1.65 1.65 0 0 0 9 5c0-.43.1-.85.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 15 1a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15 9a1.65 1.65 0 0 0 1 1.51V11a2 2 0 0 1 0 4v.49c-.3.43-.73.75-1 1.51Z"/></svg>
         </button>
-        <button class="icon-btn danger" title="Delete" onclick="deleteObject('${obj.object_uuid}', '${obj.object_name}')">
+        <button class="icon-btn danger" title="Delete" onclick="deleteObject('${obj.object_uuid}','${obj.object_name.replace(/'/g,"\\'")}')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
         </button>
-      </div>
-    `;
+      </div>`;
     list.appendChild(row);
   });
 }
-
-function openRenameModal(uuid, name) {
-  document.getElementById('rename-input').value = name;
-  document.getElementById('rename-obj-uuid').value = uuid;
-  openModal('rename-modal');
+function openObjectSettings(uuid,name,isPublic){
+  document.getElementById('edit-object-uuid').value=uuid;
+  document.getElementById('edit-object-name').value=name;
+  editObjectIsPublic=!!isPublic;
+  document.getElementById('edit-object-is-public').value=editObjectIsPublic;
+  document.getElementById('edit-object-visibility-toggle').classList.toggle('on',editObjectIsPublic);
+  document.getElementById('edit-object-visibility-label').textContent=editObjectIsPublic?'Public — anyone with link can access':'Private — only you can access';
+  document.getElementById('edit-object-visibility-desc').textContent=editObjectIsPublic?'Visible to anyone with the link':'Restricted to your account';
+  openModal('object-settings-modal');
 }
-
-async function renameObject() {
-  const uuid = document.getElementById('rename-obj-uuid').value;
-  const name = document.getElementById('rename-input').value.trim();
-  if (!name) return toast('Enter a name', 'error');
-  const r = await api('PATCH', `/buckets/${currentBucketId}/${uuid}`, { object_name: name });
-  if (r.ok) {
-    toast('Renamed!', 'success');
-    closeModal('rename-modal');
-    loadObjects();
-  } else { toast('Failed to rename', 'error'); }
+function toggleEditObjectVisibility(){
+  editObjectIsPublic=!editObjectIsPublic;
+  document.getElementById('edit-object-is-public').value=editObjectIsPublic;
+  document.getElementById('edit-object-visibility-toggle').classList.toggle('on',editObjectIsPublic);
+  document.getElementById('edit-object-visibility-label').textContent=editObjectIsPublic?'Public — anyone with link can access':'Private — only you can access';
+  document.getElementById('edit-object-visibility-desc').textContent=editObjectIsPublic?'Visible to anyone with the link':'Restricted to your account';
 }
-
-async function deleteObject(uuid, name) {
-  if (!confirm(`Delete "${name}"?`)) return;
-  const r = await api('DELETE', `/buckets/${currentBucketId}/${uuid}`);
-  if (r.ok || r.status === 204) {
-    toast(`"${name}" deleted`, 'info');
-    loadObjects();
-  } else { toast('Failed to delete', 'error'); }
+async function saveObjectSettings(){
+  const uuid=document.getElementById('edit-object-uuid').value;
+  const name=document.getElementById('edit-object-name').value.trim();
+  if(!name) return toast('Enter a name','error');
+  const isPublic=document.getElementById('edit-object-is-public').value==='true';
+  const r=await api('PATCH',`/buckets/${currentBucketId}/${uuid}`,{object_name:name,is_public:isPublic});
+  if(r.ok){toast('Object updated','success');closeModal('object-settings-modal');loadObjects();}
+  else{const err=await r.json().catch(()=>({detail:'Error'}));toast(err.detail||'Failed to update','error');}
 }
-
-function downloadObject(uuid, name) {
-  window.open(`${API}/buckets/${currentBucketId}/${uuid}`, '_blank');
+async function toggleObjectPublic(uuid,currentIsPublic,name){
+  const next=!currentIsPublic;
+  const r=await api('PATCH',`/buckets/${currentBucketId}/${uuid}`,{is_public:next});
+  if(r.ok){toast(`"${name}" is now ${next?'Public':'Private'}`,'success');loadObjects();}
+  else toast('Failed to toggle visibility','error');
 }
-
-// ── UPLOAD ──
-function handleFileSelect(e) {
-  selectedFile = e.target.files[0];
-  if (selectedFile) {
-    document.getElementById('upload-file-name').textContent = selectedFile.name;
-    if (!document.getElementById('upload-obj-name').value) {
-      const parts = selectedFile.name.split('.');
-      document.getElementById('upload-obj-name').value = parts.slice(0, -1).join('.') || selectedFile.name;
+async function deleteObject(uuid,name){
+  if(!confirm(`Delete "${name}"?`)) return;
+  const r=await api('DELETE',`/buckets/${currentBucketId}/${uuid}`);
+  if(r.ok||r.status===204){toast(`"${name}" deleted`,'info');loadObjects();}
+  else toast('Failed to delete','error');
+}
+function downloadObject(uuid){ window.open(`${API}/buckets/${currentBucketId}/${uuid}`,'_blank'); }
+function toggleUploadVisibility(){
+  uploadIsPublic=!uploadIsPublic;
+  document.getElementById('upload-is-public').value=uploadIsPublic;
+  document.getElementById('upload-visibility-toggle').classList.toggle('on',uploadIsPublic);
+  document.getElementById('upload-visibility-label').textContent=uploadIsPublic?'Public — anyone with link can access':'Private — only you can access';
+}
+function handleFileSelect(e){
+  selectedFile=e.target.files[0];
+  if(selectedFile){
+    document.getElementById('upload-file-name').textContent=selectedFile.name;
+    if(!document.getElementById('upload-obj-name').value){
+      const parts=selectedFile.name.split('.');
+      document.getElementById('upload-obj-name').value=parts.slice(0,-1).join('.')||selectedFile.name;
     }
   }
 }
-
-function handleDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('dragging'); }
-function handleDragLeave() { document.getElementById('upload-zone').classList.remove('dragging'); }
-function handleDrop(e) {
-  e.preventDefault();
-  handleDragLeave();
-  const f = e.dataTransfer.files[0];
-  if (f) {
-    selectedFile = f;
-    document.getElementById('upload-file-name').textContent = f.name;
-    if (!document.getElementById('upload-obj-name').value) {
-      const parts = f.name.split('.');
-      document.getElementById('upload-obj-name').value = parts.slice(0, -1).join('.') || f.name;
-    }
-  }
+function handleDragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('dragging');}
+function handleDragLeave(){document.getElementById('upload-zone').classList.remove('dragging');}
+function handleDrop(e){
+  e.preventDefault();handleDragLeave();
+  const f=e.dataTransfer.files[0];
+  if(f){selectedFile=f;document.getElementById('upload-file-name').textContent=f.name;if(!document.getElementById('upload-obj-name').value){const parts=f.name.split('.');document.getElementById('upload-obj-name').value=parts.slice(0,-1).join('.')||f.name;}}
 }
-
-async function uploadObject() {
-  if (!selectedFile) return toast('Please select a file', 'error');
-  const objName = document.getElementById('upload-obj-name').value.trim() || selectedFile.name;
-  const isPublic = document.getElementById('upload-is-public').value === 'true';
-
-  const ext = selectedFile.name.includes('.') ? selectedFile.name.split('.').pop() : '';
-  const fileType = selectedFile.type || 'application/octet-stream';
-  const size = selectedFile.size;
-
-  // Step 1: Create object record
-  const cr = await api('POST', `/buckets/${currentBucketId}/create-object`, {
-    object_name: objName,
-    object_size: size,
-    object_extension: ext,
-    object_file_type: fileType,
-    is_public: isPublic
-  });
-
-  if (!cr.ok) {
-    const err = await cr.json().catch(()=>({detail:'Error'}));
-    return toast(err.detail || 'Failed to create object', 'error');
-  }
-
-  const { object_uuid } = await cr.json();
-
-  // Step 2: Upload file
+async function uploadObject(){
+  if(!selectedFile) return toast('Please select a file','error');
+  const objName=document.getElementById('upload-obj-name').value.trim()||selectedFile.name;
+  const isPublic=document.getElementById('upload-is-public').value==='true';
+  const ext=selectedFile.name.includes('.')?selectedFile.name.split('.').pop():'';
+  const fileType=selectedFile.type||'application/octet-stream';
+  const size=selectedFile.size;
+  const cr=await api('POST',`/buckets/${currentBucketId}/create-object`,{object_name:objName,object_size:size,object_extension:ext,object_file_type:fileType,is_public:isPublic});
+  if(!cr.ok){const err=await cr.json().catch(()=>({detail:'Error'}));return toast(err.detail||'Failed to create object','error');}
+  const {object_uuid}=await cr.json();
   document.getElementById('upload-progress-wrap').classList.remove('hidden');
-  document.getElementById('upload-btn').disabled = true;
-  document.getElementById('upload-btn').textContent = 'Uploading…';
-
-  const ur = await fetch(`${API}/buckets/${currentBucketId}/${object_uuid}`, {
-    method: 'PUT',
-    credentials: 'include',
-    body: selectedFile,
-    headers: { 'Content-Type': fileType }
-  });
-
-  document.getElementById('upload-progress-bar').style.width = '100%';
-  document.getElementById('upload-progress-label').textContent = 'Complete!';
-
-  setTimeout(() => {
-    document.getElementById('upload-btn').disabled = false;
-    document.getElementById('upload-btn').textContent = 'Upload';
+  document.getElementById('upload-btn').disabled=true;
+  document.getElementById('upload-btn').textContent='Uploading…';
+  document.getElementById('upload-progress-bar').style.width='100%';
+  const ur=await fetch(`${API}/buckets/${currentBucketId}/${object_uuid}`,{method:'PUT',credentials:'include',body:selectedFile,headers:{'Content-Type':fileType}});
+  document.getElementById('upload-progress-label').textContent='Complete!';
+  setTimeout(()=>{
+    document.getElementById('upload-btn').disabled=false;
+    document.getElementById('upload-btn').textContent='Upload';
     document.getElementById('upload-progress-wrap').classList.add('hidden');
-    document.getElementById('upload-progress-bar').style.width = '0%';
-    selectedFile = null;
-    document.getElementById('file-input').value = '';
-    document.getElementById('upload-file-name').textContent = 'No file selected';
-    document.getElementById('upload-obj-name').value = '';
+    document.getElementById('upload-progress-bar').style.width='0%';
+    selectedFile=null;document.getElementById('file-input').value='';document.getElementById('upload-file-name').textContent='No file selected';document.getElementById('upload-obj-name').value='';
     closeModal('upload-modal');
-
-    if (ur.ok) {
-      toast(`"${objName}" uploaded!`, 'success');
-      loadObjects();
-    } else { toast('Upload failed', 'error'); }
-  }, 600);
+    if(ur.ok){toast(`"${objName}" uploaded!`,'success');loadObjects();}
+    else toast('Upload failed','error');
+  },600);
 }
-
-// ── SETTINGS ──
-async function updateUsername() {
-  const name = document.getElementById('settings-username').value.trim();
-  if (!name) return toast('Enter a new username', 'error');
-  const r = await api('PATCH', '/', { user_name: name });
-  if (r.ok) {
-    currentUser = name;
-    document.getElementById('sidebar-username').textContent = name;
-    document.getElementById('user-avatar-initials').textContent = name[0].toUpperCase();
-    toast('Username updated!', 'success');
-    document.getElementById('settings-username').value = '';
-  } else { toast('Failed to update username', 'error'); }
+async function updateUsername(){
+  const name=document.getElementById('settings-username').value.trim();
+  if(!name) return toast('Enter a new username','error');
+  const r=await api('PATCH','/',{user_name:name});
+  if(r.ok){currentUser=name;document.getElementById('sidebar-username').textContent=name;document.getElementById('user-avatar-initials').textContent=name[0].toUpperCase();toast('Username updated!','success');document.getElementById('settings-username').value='';}
+  else toast('Failed to update username','error');
 }
-
-async function updatePassword() {
-  const pass = document.getElementById('settings-password').value;
-  if (!pass) return toast('Enter a new password', 'error');
-  const r = await api('PATCH', '/', { user_password: pass });
-  if (r.ok) {
-    toast('Password updated!', 'success');
-    document.getElementById('settings-password').value = '';
-  } else { toast('Failed to update password', 'error'); }
+async function updatePassword(){
+  const pass=document.getElementById('settings-password').value;
+  if(!pass) return toast('Enter a new password','error');
+  const r=await api('PATCH','/',{user_password:pass});
+  if(r.ok){toast('Password updated!','success');document.getElementById('settings-password').value='';}
+  else toast('Failed to update password','error');
 }
-
-async function confirmDeleteAccount() {
-  if (!confirm('This will permanently delete your account and ALL data. Are you sure?')) return;
-  const r = await api('DELETE', '/');
-  if (r.ok || r.status === 204) {
-    toast('Account deleted', 'info');
-    handleLogout();
-  } else { toast('Failed to delete account', 'error'); }
+async function confirmDeleteAccount(){
+  if(!confirm('This will permanently delete your account and ALL data. Are you sure?')) return;
+  const r=await api('DELETE','/');
+  if(r.ok||r.status===204){toast('Account deleted','info');handleLogout();}
+  else toast('Failed to delete account','error');
 }
-
-// ── MODALS ──
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
-});
-
-// ── TOAST ──
-function toast(msg, type = 'info') {
-  const icons = {
-    success: `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
-    error: `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
-    info: `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m) m.classList.remove('open');});});
+function toast(msg,type='info'){
+  const icons={
+    success:`<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    error:`<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+    info:`<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
   };
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.innerHTML = `${icons[type]}<span>${msg}</span>`;
-  document.getElementById('toast-container').appendChild(el);
-  setTimeout(() => el.remove(), 3500);
+  const el=document.createElement('div');el.className=`toast ${type}`;el.innerHTML=`${icons[type]}<span>${msg}</span>`;document.getElementById('toast-container').appendChild(el);setTimeout(()=>el.remove(),3500);
 }
-
-// ── UTILS ──
-function formatBytes(bytes) {
-  if (!bytes) return '—';
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-}
-
-function fileIcon(type) {
-  if (!type) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
-  if (type.startsWith('image/')) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
-  if (type.startsWith('video/')) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
-  if (type.startsWith('audio/')) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
-  if (type === 'application/pdf') return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
+function formatBytes(bytes){if(!bytes) return '—';if(bytes<1024) return bytes+' B';if(bytes<1024*1024) return (bytes/1024).toFixed(1)+' KB';return (bytes/(1024*1024)).toFixed(1)+' MB';}
+function fileIcon(type){
+  if(!type) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
+  if(type.startsWith('image/')) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+  if(type.startsWith('video/')) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
+  if(type.startsWith('audio/')) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
+  if(type==='application/pdf') return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
 }
-
-// ── INIT ──
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    if (document.getElementById('auth-screen').style.display !== 'none') handleAuth();
-  }
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
-  }
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('auth-screen').style.display!=='none') handleAuth();
+  if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
 });
-
-// Initially hide topbar buttons
 document.getElementById('btn-new-bucket').classList.remove('hidden');
 </script>
 </body>

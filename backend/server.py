@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5500"],
+    allow_origins=["http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -266,25 +266,26 @@ def patch_bucket(bucket_id, bucket_update : BucketUpdate, request : Request):
             detail="You don't have access to this bucket"
         ) 
     bp  = useridb[0][1]
-    if not bp:
+    if bp is None:
         raise HTTPException(
                 status_code=404,
                 detail="No such bucket found"
             )
     output_json = {"message" : "Patch successful", "patches": []}
-    if bucket_update.bucket_name:
-        db.buckets.update({ "bucket_id" : bucket_id}, bucket_name=bucket_update.bucket_name)
+    if bucket_update.bucket_name is not None and bucket_update.bucket_name.strip() != "":
+        db.buckets.update({ "bucket_id" : bucket_id}, bucket_name=bucket_update.bucket_name.strip())
         output_json.get("patches", []).append("bucket_name")
-    if bucket_update.bucket_password_old:
-        if bucket_update.bucket_password:
-            if bp == bucket_update.bucket_password_old:
-                db.buckets.update({"bucket_id" : bucket_id}, bucket_password=bucket_update.bucket_password)
-                output_json.get('patches', []).append('bucket_password')
-            else:
-                raise HTTPException(
-                    status_code=403,
-                    detail="Passwords don't match"
-                )
+    if bucket_update.bucket_password_old is not None and bucket_update.bucket_password is not None:
+        if bucket_update.bucket_password_old.strip() == "" or bucket_update.bucket_password.strip() == "":
+            raise HTTPException(status_code=400, detail="Password cannot be empty")
+        if bp == bucket_update.bucket_password_old:
+            db.buckets.update({"bucket_id" : bucket_id}, bucket_password=bucket_update.bucket_password)
+            output_json.get('patches', []).append('bucket_password')
+        else:
+            raise HTTPException(
+                status_code=403,
+                detail="Passwords don't match"
+            )
             
 
     return output_json   
@@ -375,23 +376,23 @@ def patch_object(bucket_id, object_uuid ,object_update : ObjectUpdate, request: 
             )
  
     output_json = {"message": "Patch successful" ,"patches" : []}
-    if object_update.object_name:
-        db.objects.update({ "object_uuid" : object_uuid}, object_name=object_update.object_name)
+    if object_update.object_name is not None and object_update.object_name.strip() != "":
+        db.objects.update({ "object_uuid" : object_uuid}, object_name=object_update.object_name.strip())
         output_json.get("patches", []).append("object_name")
 
-    if object_update.is_public!=None:
+    if object_update.is_public is not None:
         db.objects.update({"object_uuid" : object_uuid}, is_public=object_update.is_public)
         output_json.get("patches", []).append("is_public")
         
-    if object_update.object_extension!=None:
+    if object_update.object_extension is not None:
         db.objects.update({"object_uuid" : object_uuid}, object_extension=object_update.object_extension)
         output_json.get("patches", []).append("object_extension")
         
-    if object_update.object_file_type!=None:
+    if object_update.object_file_type is not None:
         db.objects.update({"object_uuid" : object_uuid}, object_file_type=object_update.object_file_type)
         output_json.get("patches", []).append("object_file_type")
 
-    if object_update.object_size!=None:
+    if object_update.object_size is not None:
         db.objects.update({"object_uuid" : object_uuid}, object_size=object_update.object_size)
         output_json.get("patches", []).append("object_size")
 
@@ -407,9 +408,11 @@ def delete_object(bucket_id,object_uuid ,request: Request):
     if not user_id_b:
         raise HTTPException(
             status_code= 404, 
-            detail="User not found"
+            detail="Object not found"
         )
     user_id = get_user_id(request)
+    if user_id != user_id_b[0][0]:
+        raise HTTPException(status_code=403, detail="You don't have access to this object")
     db.objects.delete(object_uuid=object_uuid)
 
 @app.put("/buckets/{bucket_id}/{object_uuid}", status_code=status.HTTP_200_OK)
