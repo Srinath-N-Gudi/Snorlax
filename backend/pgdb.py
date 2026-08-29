@@ -124,9 +124,26 @@ class DB(BaseDB):
     user_password VARCHAR(100) NOT NULL,
     date_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+    
 
 """)
+    
         logging.info("Created `users` table")
+    def __create_sessions_table(self):
+        self.exec("""
+        CREATE TABLE IF NOT EXISTS sessions (
+        session_id UUID PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NOT NULL,
+
+        FOREIGN KEY (user_id)
+            REFERENCES users(user_id)
+            ON DELETE CASCADE
+);
+        """)
+            
+        logging.info("Created `cookie` table")
 
     def __create_buckets_table(self):
         self.exec("""
@@ -181,6 +198,8 @@ class DB(BaseDB):
                 self.__create_buckets_table()
             elif table_name == "objects":
                 self.__create_objects_table()
+            elif table_name == "sessions":
+                self.__create_sessions_table()
         else:
             logging.info(f"✅ {table_name} table exist")
 
@@ -191,6 +210,7 @@ class DB(BaseDB):
         self.__check_exists_and_call("users")
         self.__check_exists_and_call("buckets")
         self.__check_exists_and_call("objects")
+        self.__check_exists_and_call("sessions")
 
     @property
     def users(self):
@@ -201,4 +221,7 @@ class DB(BaseDB):
     @property
     def objects(self):
         return Table("objects", self)
+    @property
+    def sessions(self):
+        return Table("sessions", self)
     
